@@ -1,0 +1,6 @@
+(set-logic QF_S)
+(declare-fun e () String)
+(declare-fun x () String)
+(assert (= 1 (str.len e)))
+(assert (= (str.++ e "123") (str.++ e "123")))
+(check-sat)

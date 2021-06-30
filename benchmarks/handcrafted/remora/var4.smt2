@@ -1,0 +1,7 @@
+(set-logic QF_S)
+(declare-fun x () String)
+(declare-fun y () String)
+(declare-fun w () String)
+(declare-fun z () String)
+(assert (= (str.++ x y z w ) (str.++ "1" w w w)))
+(check-sat)
