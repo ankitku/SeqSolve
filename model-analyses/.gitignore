@@ -1,0 +1,17 @@
+Makefile-tmp
+*~
+*.cert
+*.out
+*.fasl
+*.port
+*.aux
+*.log
+*.core
+*.bbl
+*.axp
+*.fdb*
+*.dvi
+*.blg
+*.fls
+*.time
+main.pdf

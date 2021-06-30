@@ -1,0 +1,110 @@
+
+
+* Building Seqsolve
+
+  
+** lisp-z3 interface
+Seqsolve depends on a lisp-z3 interface available here
+
+$ git clone
+git@gitlab.com:acl2s/model-based-development/model-analyses.git
+
+$ cd model-analyses/lisp-z3/examples/acl2s/
+
+Create softlinks to the following files in SeqSolve, from this directory:
+
+seq_raw_code.lsp, seqsolve.lisp, seqsolve.acl2, build.lisp,
+higher-order.lisp, eval.lisp, metering.cl 
+
+** Certification of seqsolve.lisp
+We use cert.pl (
+https://www.cs.utexas.edu/users/moore/acl2/manuals/current/manual/?topic=BUILD____CERT.PL)
+to certify the ACL2S part of the code :
+
+$ cert.pl -j 100 seqsolve.lisp
+
+** Creating an executable
+There are two functions in build.lisp : 
+1) build-seqsolve  : Builds an executable "seqsolve_exec" that runs
+   SeqSolve on a single smt2 file
+2) build-eval-seqsolve : Builds an executable
+   "eval_seqsolve_servm_exec" that runs SeqSolve in server mode
+   i.e. it accepts a directory, for example benchmarks, containing smt2 files and runs SeqSolve
+   on each of them. After completion, it outputs a file
+   "benchmarks-srvseqslv.json" which can be used to generate a cactus plot.
+
+Make sure that only one of them is called at the end of build.lisp
+After choosing which executable to build, run the following command:
+
+$ acl2s < build.lisp
+
+* Building the evaluation tool
+
+The evaluation tool can be built by running:
+
+$ acl2s < eval.lisp
+
+which creates an executable eval_tool_exec, which can be run as 
+
+$ ./eval_tool_exec $tool_name $benchmark
+
+where $tool_name is one of seqsolve, cvc4, z3 or norn
+and benchmark is one of the benchmark directories. We won't need to
+run this tool ourselves, as we have driving scripts to run evaluations
+and to plot the results.
+
+* Setting up the environment 
+
+All tools to be evaluated need to be on the PATH.
+This can be checked by 
+$ cvc4 --version
+This is CVC4 version 1.7-prerelease [git master f93a68fd]
+
+$ z3 --version
+Z3 version 4.8.8 - 64 bit
+
+$ cvc4 --version                                                                          
+This is CVC4 version 1.7-prerelease
+
+$
+Let ~/bin be a directory already
+on PATH. Then, create a softlink:
+$ ln -s /path/to/seqsolve_exec ~/bin/seqsolve
+
+reload the terminal, then
+
+$ seqsolve --version
+"SeqSolve 1.0"
+
+Norn needs to be downloaded from 
+http://user.it.uu.se/~jarst116/norn/
+
+Note that norn needs to be run from the directory it is downloaded in,
+so, its absolute location needs to be specified in norn-capture
+function of eval.lisp
+
+* Benchmark Evaluation and Plotting
+The plotting-scripts directory contains two executable files:
+
+** eval-tools.sh
+This script runs all competing solvers on a given benchmark. 
+Arguments to the script specify the benchmark directory, number of
+times to run each tool and output directory. For example:
+
+$ ./eval-tools.sh -b ~/dev/monoid-solver/evaluation/handcrafted/ -n 5
+-d plots
+ runs each tool on handcrafted benchmark 5 times and stores JSON
+ results in a directory named plots
+
+** make-plots.sh
+This script plots cactus graphs for each tool that ran on a given
+benchmark. Arguments to the script specify the benchmark directory,
+what time to use for y axis, number of
+runs to consider for each tool and the output directory. For example:
+
+$ ./make-plots.sh -b ~/dev/monoid-solver/evaluation/handcrafted/ -n 3
+-d plots -t realtime
+
+plots a cactus graph with both, a normal and log scaled yaxis for all
+the competing tools on the handcrafted benchmark.
+ 

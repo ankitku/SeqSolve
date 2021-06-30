@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Saved July 15, 2020  18:15:01
+#  then July 15, 2020  18:56:11
+#  then January 23, 2021  21:58:24
+
+absdir=`perl -e 'use Cwd "abs_path";print abs_path(shift)' $0`
+THISSCRIPTDIR="$( cd "$( dirname "$absdir" )" && pwd -P )"
+export SBCL_HOME='/usr/local/Cellar/sbcl/1.4.11/lib/sbcl/'
+exec "sbcl" --dynamic-space-size 32000 --control-stack-size 64 --disable-ldb --noinform --core "$THISSCRIPTDIR/eval_tool_exec.core" ${SBCL_USER_ARGS} --end-runtime-options --no-userinit --eval '(acl2::sbcl-restart)' --eval '(declaim (sb-ext:muffle-conditions style-warning))' --eval '(acl2s::eval-tool (cdr sb-ext:*posix-argv*))' --disable-debugger "$@"
